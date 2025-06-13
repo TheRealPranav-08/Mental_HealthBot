@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Health Companion</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #6C63FF;
+            --primary-light: #E6E5FF;
+            --secondary-color: #4ECDC4;
+            --text-color: #333333;
+            --light-text: #666666;
+            --bg-color: #F9FAFC;
+            --border-radius: 12px;
+            --shadow: 0 4px 12px rgba(0,0,0,0.08);
+            --transition: all 0.3s ease;
+            --user-message: #E6F7FF;
+            --bot-message: #F5F5F5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 280px;
+            background-color: white;
+            box-shadow: var(--shadow);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-left: 10px;
+            color: var(--primary-color);
+        }
+
+        .menu {
+            list-style: none;
+            margin-bottom: 30px;
+            flex-grow: 1;
+        }
+
+        .menu li {
+            margin-bottom: 5px;
+        }
+
+        .menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 8px;
+            color: var(--light-text);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .menu a:hover, .menu a.active {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .menu a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .info-box {
+            background-color: var(--primary-light);
+            padding: 20px;
+            border-radius: var(--border-radius);
+        }
+
+        .info-box h3 {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .info-box p {
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+
+        .info-box a {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .info-box a:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .chat-header {
+            padding: 15px 25px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-title span {
+            margin-left: 10px;
+        }
+
+        .chat-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-left: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--light-text);
+        }
+
+        .action-btn:hover {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .user {
+            justify-content: flex-end;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: var(--primary-color);
+        }
+
+        .user .avatar {
+            margin-right: 0;
+            margin-left: 12px;
+            background-color: #E3F2FD;
+            color: #1976D2;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            position: relative;
+        }
+
+        .user .message-bubble {
+            background-color: var(--user-message);
+            border-bottom-right-radius: 0;
+        }
+
+        .assistant .message-bubble {
+            background-color: var(--bot-message);
+            border-bottom-left-radius: 0;
+        }
+
+        .message-text {
+            margin-bottom: 5px;
+            line-height: 1.5;
+        }
+
+        .message-time {
+            font-size: 0.8rem;
+            color: var(--light-text);
+            text-align: right;
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background-color: white;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-input-wrapper {
+            flex-grow: 1;
+            background-color: var(--bg-color);
+            border-radius: 25px;
+            padding: 5px 20px;
+            display: flex;
+            align-items: center;
+            margin-right: 15px;
+        }
+
+        .chat-input {
+            flex-grow: 1;
+            border: none;
+            background: transparent;
+            height: 50px;
+            outline: none;
+            font-size: 1rem;
+            padding: 0 10px;
+        }
+
+        .chat-input-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .input-action-btn {
+            background: none;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--light-text);
+        }
+
+        .input-action-btn:hover {
+            background-color: rgba(0,0,0,0.05);
+            color: var(--primary-color);
+        }
+
+        .send-btn {
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .listen-animation {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .typing-indicator {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: var(--bot-message);
+            border-radius: var(--border-radius);
+            border-bottom-left-radius: 0;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .typing-dot {
+            display: block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background-color: var(--light-text);
+            margin: 0 3px;
+            opacity: 0.6;
+        }
+
+        .typing-dot:nth-child(1) {
+            animation: typing 1.4s infinite;
+        }
+        .typing-dot:nth-child(2) {
+            animation: typing 1.4s infinite 0.2s;
+        }
+        .typing-dot:nth-child(3) {
+            animation: typing 1.4s infinite 0.4s;
+        }
+
+        @keyframes typing {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
+        }
+
+        /* Mobile styles */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                overflow: auto;
+                height: auto;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 10;
+                top: 0;
+                left: 0;
+                height: 100%;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                height: 100vh;
+            }
+
+            .message-bubble {
+                max-width: 80%;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+        }
+
+
+
+
+        
+    .speech-controls {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        padding: 10px;
+        z-index: 1000;
+        transition: all 0.3s ease;
+    }
+    
+    .speech-controls-inner {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .speech-controls button {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .btn-speaking {
+        animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+        0% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.6;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+</style>
+
+
+        
+
+
+    
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-brain" style="font-size: 1.8rem; color: var(--primary-color);"></i>
+            <h1>MindfulBot</h1>
+        </div>
+        <ul class="menu">
+            <li><a href="{{ url_for('index') }}" class="active"><i class="fas fa-comment-dots"></i> Chat</a></li>
+            <li><a href="{{ url_for('chat_history_page') }}"><i class="fas fa-history"></i> Chat History</a></li>
+            <!-- <li><a href="#"><i class="fas fa-book"></i> Resources</a></li> -->
+            <!-- <li><a href="#"><i class="fas fa-lightbulb"></i> Techniques</a></li>
+            <li><a href="#"><i class="fas fa-question-circle"></i> About</a></li> -->
+            <li><a href="{{ url_for('start_new_chat') }}"><i class="fas fa-plus-circle"></i> New Chat</a></li>
+        </ul>
+        <div class="info-box">
+            <h3>Need professional help?</h3>
+            <p>If you're experiencing a mental health crisis, please reach out to a professional right away.</p>
+            <a href="https://www.mentalhealthhotline.org/" target="_blank">Find Help</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="chat-header">
+            <div class="chat-title">
+                <i class="fas fa-comment-alt"></i>
+                <span>Chat with MindfulBot</span>
+            </div>
+            <div class="chat-actions">
+                <a href="{{ url_for('start_new_chat') }}" class="action-btn" title="New Chat">
+                    <i class="fas fa-plus"></i>
+                </a>
+                <a href="{{ url_for('chat_history_page') }}" class="action-btn" title="Chat History">
+                    <i class="fas fa-history"></i>
+                </a>
+                <button class="action-btn menu-toggle" id="menuToggle" title="Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chat-container">
+            <!-- Messages will appear here -->
+            <div class="message assistant">
+                <div class="avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="message-bubble">
+                    <div class="message-text">Hello! I'm here to listen and support you. How are you feeling today?</div>
+                    <div class="message-time">Now</div>
+                </div>
+            </div>
+            
+            <!-- Existing chat messages from database will be loaded here -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="message {{ message.role }}">
+                        <div class="avatar">
+                            {% if message.role == 'user' %}
+                                <i class="fas fa-user"></i>
+                            {% else %}
+                                <i class="fas fa-robot"></i>
+                            {% endif %}
+                        </div>
+                        <div class="message-bubble">
+                            <div class="message-text">{{ message.content }}</div>
+                            <div class="message-time">{{ message.timestamp.strftime('%H:%M') }}</div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="chat-input-container">
+            <div class="chat-input-wrapper">
+                <input type="text" class="chat-input" id="user-input" placeholder="Type your message here...">
+                <div class="chat-input-actions">
+                    <button class="input-action-btn" id="voice-btn" title="Voice input">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                </div>
+            </div>
+            <button class="send-btn" id="send-btn">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+
+
+
+
+    <!-- Add this somewhere in your index.html file, just before the closing </body> tag -->
+<div class="speech-controls" id="speechControls" style="display: none;">
+    <div class="speech-controls-inner">
+        <button id="pauseResumeBtn" class="btn btn-primary">
+            <i class="fas fa-pause"></i> Pause
+        </button>
+        <button id="stopBtn" class="btn btn-danger">
+            <i class="fas fa-stop"></i> Stop
+        </button>
+    </div>
+</div>
+
+
+
+
+
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatContainer = document.getElementById('chat-container');
+            const userInput = document.getElementById('user-input');
+            const sendBtn = document.getElementById('send-btn');
+            const voiceBtn = document.getElementById('voice-btn');
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.querySelector('.sidebar');
+
+            // Scroll to bottom of chat
+            function scrollToBottom() {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+            
+            // Initial scroll to bottom
+            scrollToBottom();
+
+            // Add a new message to the chat
+            function addMessage(content, isUser = false) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${isUser ? 'user' : 'assistant'}`;
+
+                const avatarDiv = document.createElement('div');
+                avatarDiv.className = 'avatar';
+                avatarDiv.innerHTML = isUser ? 
+                    '<i class="fas fa-user"></i>' : 
+                    '<i class="fas fa-robot"></i>';
+
+                const bubbleDiv = document.createElement('div');
+                bubbleDiv.className = 'message-bubble';
+
+                const textDiv = document.createElement('div');
+                textDiv.className = 'message-text';
+                textDiv.textContent = content;
+
+                const timeDiv = document.createElement('div');
+                timeDiv.className = 'message-time';
+                const now = new Date();
+                timeDiv.textContent = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+
+                bubbleDiv.appendChild(textDiv);
+                bubbleDiv.appendChild(timeDiv);
+
+                messageDiv.appendChild(avatarDiv);
+                messageDiv.appendChild(bubbleDiv);
+
+                chatContainer.appendChild(messageDiv);
+                scrollToBottom();
+
+                return messageDiv;
+            }
+
+            // Show typing indicator
+            function showTypingIndicator() {
+                const typingDiv = document.createElement('div');
+                typingDiv.className = 'message assistant typing-indicator-container';
+                typingDiv.id = 'typing-indicator';
+                
+                const avatarDiv = document.createElement('div');
+                avatarDiv.className = 'avatar';
+                avatarDiv.innerHTML = '<i class="fas fa-robot"></i>';
+                
+                const indicatorDiv = document.createElement('div');
+                indicatorDiv.className = 'typing-indicator';
+                indicatorDiv.innerHTML = `
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                `;
+                
+                typingDiv.appendChild(avatarDiv);
+                typingDiv.appendChild(indicatorDiv);
+                
+                chatContainer.appendChild(typingDiv);
+                scrollToBottom();
+            }
+
+            // Hide typing indicator
+            function hideTypingIndicator() {
+                const typingIndicator = document.getElementById('typing-indicator');
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
+            }
+
+            // Send message to the server
+            async function sendMessage(message, inputType = 'text') {
+                // Add user message to chat
+                addMessage(message, true);
+                
+                // Show typing indicator
+                showTypingIndicator();
+                
+                // Clear input field
+                userInput.value = '';
+                
+                try {
+                    // Send message to server
+                    const response = await fetch('/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: message,
+                            input_type: inputType
+                        })
+                    });
+                    
+                    // Parse response
+                    const data = await response.json();
+                    
+                    // Hide typing indicator
+                    hideTypingIndicator();
+                    
+                    // Add bot response to chat
+                    addMessage(data.response, false);
+                } catch (error) {
+                    console.error('Error sending message:', error);
+                    
+                    // Hide typing indicator
+                    hideTypingIndicator();
+                    
+                    // Add error message
+                    addMessage('Sorry, I encountered an error. Please try again.', false);
+                }
+            }
+
+            // Handle send button click
+            sendBtn.addEventListener('click', function() {
+                const message = userInput.value.trim();
+                if (message) {
+                    sendMessage(message);
+                }
+            });
+
+            // Handle enter key press
+            userInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    const message = userInput.value.trim();
+                    if (message) {
+                        sendMessage(message);
+                    }
+                }
+            });
+
+            // Handle voice input button
+            voiceBtn.addEventListener('click', function() {
+                voiceBtn.classList.add('listen-animation');
+                voiceBtn.querySelector('i').className = 'fas fa-circle';
+                
+                // Here you would typically use the Web Speech API
+                // For this example, we'll simulate voice input after a delay
+                setTimeout(function() {
+                    voiceBtn.classList.remove('listen-animation');
+                    voiceBtn.querySelector('i').className = 'fas fa-microphone';
+                    
+                    // In reality, you'd get real speech input here
+                    // For demo purposes, let's pretend the user said something:
+                    // sendMessage("Hello from voice input", 'voice');
+                    
+                    alert('For voice input, you would need to implement Web Speech API or use your server-side voice input functionality.');
+                }, 3000);
+            });
+
+            // Handle menu toggle for mobile
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('active');
+            });
+        });
+    </script>
+
+
+
+
+
+
+
+
+
+
+<!-- Add this JavaScript to handle speech controls -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const speechControls = document.getElementById('speechControls');
+        const pauseResumeBtn = document.getElementById('pauseResumeBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        let isSpeaking = false;
+        let isPaused = false;
+        
+        // Speech control functions
+        function updateSpeechControls() {
+            if (isSpeaking) {
+                speechControls.style.display = 'block';
+                pauseResumeBtn.innerHTML = isPaused ? 
+                    '<i class="fas fa-play"></i> Resume' : 
+                    '<i class="fas fa-pause"></i> Pause';
+            } else {
+                speechControls.style.display = 'none';
+            }
+        }
+        
+        // Add a speak button to each message
+        function addSpeakButtonsToMessages() {
+            document.querySelectorAll('.message.assistant').forEach(msg => {
+                if (!msg.querySelector('.speak-btn')) {
+                    const content = msg.querySelector('.message-content').innerText;
+                    const btnContainer = document.createElement('div');
+                    btnContainer.className = 'message-actions';
+                    
+                    const speakBtn = document.createElement('button');
+                    speakBtn.className = 'speak-btn';
+                    speakBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+                    speakBtn.title = 'Listen to this message';
+                    speakBtn.onclick = function() {
+                        speakText(content);
+                    };
+                    
+                    btnContainer.appendChild(speakBtn);
+                    msg.appendChild(btnContainer);
+                }
+            });
+        }
+        
+        // Speak the text
+        function speakText(text) {
+            fetch('/speak', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text: text }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'speaking') {
+                    isSpeaking = true;
+                    isPaused = false;
+                    updateSpeechControls();
+                    
+                    // Check status periodically
+                    checkSpeechStatus();
+                }
+            });
+        }
+        
+        // Check if speech is still active
+        function checkSpeechStatus() {
+            if (!isSpeaking) return;
+            
+            fetch('/speech-status')
+            .then(response => response.json())
+            .then(data => {
+                isSpeaking = data.is_speaking;
+                isPaused = data.is_paused;
+                updateSpeechControls();
+                
+                if (isSpeaking) {
+                    setTimeout(checkSpeechStatus, 1000);
+                }
+            });
+        }
+        
+        // Handle pause/resume button
+        pauseResumeBtn.addEventListener('click', function() {
+            fetch('/pause-speech', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'paused') {
+                    isPaused = true;
+                } else if (data.status === 'resumed') {
+                    isPaused = false;
+                }
+                updateSpeechControls();
+            });
+        });
+        
+        // Handle stop button
+        stopBtn.addEventListener('click', function() {
+            fetch('/stop-speech', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                isSpeaking = false;
+                updateSpeechControls();
+            });
+        });
+        
+        // Add speak button to any new messages
+        const chatMessages = document.querySelector('#chatMessages');
+        if (chatMessages) {
+            // Initial setup
+            addSpeakButtonsToMessages();
+            
+            // Watch for new messages
+            const observer = new MutationObserver(function(mutations) {
+                addSpeakButtonsToMessages();
+            });
+            
+            observer.observe(chatMessages, { childList: true, subtree: true });
+        }
+        
+        // Add speak button to the send button
+        const sendMessageForm = document.querySelector('#sendMessageForm');
+        if (sendMessageForm) {
+            const speakResponseCheckbox = document.createElement('div');
+            speakResponseCheckbox.className = 'form-check mb-2';
+            speakResponseCheckbox.innerHTML = `
+                <input class="form-check-input" type="checkbox" id="autoSpeakResponse">
+                <label class="form-check-label" for="autoSpeakResponse">
+                    <i class="fas fa-volume-up"></i> Auto-speak responses
+                </label>
+            `;
+            
+            sendMessageForm.insertBefore(speakResponseCheckbox, sendMessageForm.querySelector('button[type="submit"]'));
+            
+            // If you have an existing chat.js or similar, modify the sendMessage function
+            // to check this checkbox and automatically speak responses when checked
+            const originalSendMessage = window.sendMessage || function(){};
+            window.sendMessage = function(message) {
+                const result = originalSendMessage(message);
+                
+                // After message is sent and response received
+                if (document.getElementById('autoSpeakResponse').checked) {
+                    // This part would need to integrate with your existing code
+                    // that handles the response from the server
+                }
+                
+                return result;
+            };
+        }
+    });
+    
+    // Modify your existing sendMessage function to include auto-speak
+    // This depends on your existing JavaScript structure, but generally:
+    function handleResponse(response) {
+        // Your existing code to add the message to the UI
+        
+        // Check if auto-speak is enabled and speak the response
+        if (document.getElementById('autoSpeakResponse').checked) {
+            speakText(response);
+        }
+    }
+</script>
+
+
+
+
+
+
+
+
+
+
+    
+</body>
+</html>

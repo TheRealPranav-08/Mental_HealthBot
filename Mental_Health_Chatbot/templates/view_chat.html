@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Chat - Mental Health Companion</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #6C63FF;
+            --primary-light: #E6E5FF;
+            --secondary-color: #4ECDC4;
+            --text-color: #333333;
+            --light-text: #666666;
+            --bg-color: #F9FAFC;
+            --border-radius: 12px;
+            --shadow: 0 4px 12px rgba(0,0,0,0.08);
+            --transition: all 0.3s ease;
+            --user-message: #E6F7FF;
+            --bot-message: #F5F5F5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .nav-links {
+            margin-bottom: 20px;
+        }
+
+        .nav-links a {
+            color: var(--light-text);
+            text-decoration: none;
+            margin-right: 20px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .nav-links a i {
+            margin-right: 6px;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .chat-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .chat-header {
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .chat-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .chat-messages {
+            padding: 20px;
+            height: 500px;
+            overflow-y: auto;
+            background-color: var(--bg-color);
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+        }
+
+        .user {
+            justify-content: flex-end;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            position: relative;
+        }
+
+        .user .message-bubble {
+            background-color: var(--user-message);
+            border-bottom-right-radius: 0;
+        }
+
+        .assistant .message-bubble {
+            background-color: var(--bot-message);
+            border-bottom-left-radius: 0;
+        }
+
+        .message-text {
+            margin-bottom: 5px;
+            line-height: 1.5;
+        }
+
+        .message-time {
+            font-size: 0.8rem;
+            color: var(--light-text);
+            text-align: right;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: var(--text-color);
+            border: 1px solid #e0e0e0;
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            opacity: 0.95;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 0;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #e0e0e0;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h2 {
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        .empty-state p {
+            color: var(--light-text);
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .message-bubble {
+                max-width: 85%;
+            }
+            
+            .btn-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-links">
+            <a href="{{ url_for('chat_history_page') }}"><i class="fas fa-arrow-left"></i> Back to Chat History</a>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-title">Chat Session</div>
+            </div>
+
+            <div class="chat-messages">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="message {{ message.role }}">
+                            <div class="message-bubble">
+                                <div class="message-text">{{ message.content }}</div>
+                                <div class="message-time">{{ message.timestamp.strftime('%Y-%m-%d %H:%M') }}</div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-comment-slash"></i>
+                        <h2>No messages in this chat</h2>
+                        <p>This chat session is empty</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="btn-container">
+            <a href="{{ url_for('index') }}" class="btn btn-primary">
+                <i class="fas fa-comment-dots"></i> Continue This Chat
+            </a>
+            <a href="{{ url_for('start_new_chat') }}" class="btn btn-secondary">
+                <i class="fas fa-plus"></i> Start New Chat
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Auto-scroll to bottom of chat messages
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatMessages = document.querySelector('.chat-messages');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        });
+    </script>
+</body>
+</html>
